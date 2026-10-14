@@ -1,0 +1,245 @@
+:root {
+  --vp-code-lang-color: #526159;
+  --vp-c-brand-1: #20604e;
+  --vp-c-brand-2: #174b40;
+  --vp-c-brand-3: #20604e;
+  --vp-c-brand-soft: #20604e12;
+  --vp-c-bg: #fcfbf7;
+  --vp-c-bg-alt: #f2f2eb;
+  --vp-c-bg-soft: #f0f1e9;
+  --vp-c-text-1: #243a32;
+  --vp-c-text-2: #526159;
+  --vp-font-family-base: 'Segoe UI', sans-serif;
+}
+.vp-doc h1 {
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.12;
+  letter-spacing: -1.5px;
+  max-width: 650px;
+}
+.vp-doc h2 {
+  letter-spacing: -0.6px;
+}
+.eyebrow {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.6px;
+  font-weight: 750;
+}
+.intro-deck {
+  font-size: 21px;
+  line-height: 1.65;
+  color: var(--vp-c-text-2);
+}
+.opening {
+  border-left: 4px solid #9dac46;
+  padding: 6px 22px;
+  margin: 28px 0;
+  background: #f0f1e9;
+}
+.cast {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 24px 0;
+}
+.cast article {
+  border-top: 3px solid #20604e;
+  padding: 18px;
+  background: #f0f1e9;
+}
+.cast h3 {
+  margin: 8px 0;
+  font-size: 22px;
+}
+.cast p {
+  margin: 8px 0 0;
+}
+.handoff {
+  margin: 28px 0;
+  border: 1px solid #c9d0c4;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #fffefa;
+}
+.walk-top {
+  padding: 20px 22px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  color: #536259;
+  font-size: 13px;
+}
+.step-dots {
+  display: flex;
+  gap: 9px;
+  padding: 18px 22px;
+}
+.step-dots button {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid #abb7aa;
+  font-weight: 700;
+}
+.step-dots button[aria-current] {
+  background: #174b40;
+  color: white;
+  border-color: #174b40;
+}
+.step-content {
+  padding: 4px 22px 20px;
+  min-height: 420px;
+}
+.route {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 12px;
+  font-weight: 650;
+  color: #526159;
+}
+.handoff h3 {
+  margin-top: 16px;
+  font-size: 25px;
+  line-height: 1.25;
+}
+.handoff .spoken {
+  font-size: 20px;
+  line-height: 1.5;
+  color: #174b40;
+  font-weight: 600;
+}
+.evidence {
+  border-top: 1px dashed #bcc7b8;
+  padding-top: 16px;
+}
+.state {
+  display: inline-block;
+  background: #e7eddc;
+  border-radius: 5px;
+  padding: 1px 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.evidence p {
+  font-size: 13px;
+  line-height: 1.7;
+  margin-bottom: 0;
+}
+.walk-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 22px;
+  border-top: 1px solid #d5dacd;
+  background: #f3f4ed;
+}
+.walk-controls button {
+  border: 1px solid #a5b5a3;
+  border-radius: 8px;
+  padding: 9px 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.walk-controls .primary {
+  background: #174b40;
+  color: white;
+  border-color: #174b40;
+}
+.walk-controls button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.handoff button:not(:disabled),
+.answers button {
+  cursor: pointer;
+}
+.handoff button:focus-visible,
+.answers button:focus-visible {
+  outline: 3px solid #886f21;
+  outline-offset: 3px;
+}
+.knowledge-check {
+  margin: 28px 0;
+  padding: 24px;
+  background: #eaf0e4;
+  border-radius: 16px;
+}
+.knowledge-check h3 {
+  margin-top: 10px;
+}
+.answers {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+.answers button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  padding: 13px;
+  border: 1px solid #b4c1ad;
+  background: #fcfbf7;
+  border-radius: 8px;
+  line-height: 1.5;
+}
+.answers button[aria-pressed='true'] {
+  border-color: #174b40;
+  box-shadow: inset 0 0 0 1px #174b40;
+}
+.answer-letter {
+  font-size: 12px;
+  font-weight: 750;
+  color: #526159;
+}
+.feedback {
+  border-left: 3px solid #20604e;
+  padding-left: 14px;
+}
+.quiz-hint {
+  font-size: 13px;
+  color: #526159;
+}
+.say-it {
+  font-size: 21px;
+  line-height: 1.65;
+  padding: 24px;
+  background: #174b40;
+  color: #fffefa;
+  border-radius: 12px;
+}
+@media (max-width: 600px) {
+  .cast {
+    grid-template-columns: 1fr;
+  }
+  .walk-top,
+  .walk-controls {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .step-dots {
+    padding: 16px;
+    gap: 7px;
+  }
+  .step-dots button {
+    width: 34px;
+    height: 34px;
+  }
+  .step-content {
+    padding: 4px 16px 20px;
+    min-height: 0;
+  }
+  .walk-controls button {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .knowledge-check {
+    padding: 18px;
+  }
+  .intro-deck {
+    font-size: 19px;
+  }
+}

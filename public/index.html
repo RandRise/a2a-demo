@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Watch two agents discover, delegate, and return a result using the A2A protocol."
+    />
+    <meta name="theme-color" content="#182724" />
+    <title>Relay — Agent-to-agent, explained</title>
+    <link rel="icon" href="/assets/relay.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles/base.css" />
+    <link rel="stylesheet" href="/styles/components.css" />
+    <script type="module" src="/js/app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to workspace</a>
+    <aside class="sidebar">
+      <a class="brand" href="/" aria-label="Relay home"
+        ><img src="/assets/relay.svg" alt="" width="34" height="34" /><span
+          >relay<span class="brand-dot">.</span></span
+        ></a
+      >
+      <div class="sidebar-intro">A small lab for<br />agents working together.</div>
+      <div class="nav-label">THE WORKSPACE</div>
+      <nav aria-label="Main navigation">
+        <button class="nav-item active" data-view="workspace" aria-current="page">
+          <span class="nav-icon">↗</span> Run a handoff <span class="nav-count">01</span>
+        </button>
+        <button class="nav-item" data-view="guide">
+          <span class="nav-icon">≋</span> How it works <span class="nav-count">02</span>
+        </button>
+        <button class="nav-item" data-view="catalogue">
+          <span class="nav-icon">▦</span> Venue catalogue <span class="nav-count">03</span>
+        </button>
+      </nav>
+      <div class="sidebar-lesson">
+        <span class="small-label">THE BIG IDEA</span>
+        <p>A tool performs an operation.<br />An agent takes on a goal.</p>
+        <span class="lesson-line"></span><span>Watch responsibility<br />move between agents.</span>
+      </div>
+      <div class="sidebar-bottom">
+        <button
+          id="connection-open"
+          class="connection-button"
+          aria-label="Model connection"
+          title="Model connection"
+        >
+          <span class="connection-dot" id="connection-dot"></span
+          ><span
+            ><strong>Model connection</strong
+            ><small id="connection-label">Rehearsal is ready</small></span
+          ><span>↗</span>
+        </button>
+        <div class="course-label">AI OPERATIONS <span>TEAM 03</span></div>
+      </div>
+    </aside>
+
+    <main id="main" tabindex="-1">
+      <header class="topbar">
+        <div>
+          <span class="breadcrumb">Course lab</span><span class="breadcrumb-slash">/</span
+          ><span id="view-name">Agent-to-agent</span>
+        </div>
+        <span class="protocol-pill"
+          ><span></span> A2A 1.0 <span class="pill-divider">/</span> JSON-RPC</span
+        >
+      </header>
+
+      <section id="workspace-view" class="view">
+        <div class="page-heading">
+          <div>
+            <div class="eyebrow">TWO AGENTS. ONE SHARED OUTCOME.</div>
+            <h1>Delegation, made visible.</h1>
+            <p>Give the coordinator a brief. Follow the handoff. See what comes back.</p>
+          </div>
+          <button id="reset" class="button secondary">↻ <span>New run</span></button>
+        </div>
+        <div class="agent-strip" aria-label="Agent roles">
+          <div class="agent-identity">
+            <span class="avatar coordinator">C<span>↗</span></span>
+            <div><strong>Coordinator</strong><span>Owns the workshop plan</span></div>
+            <span class="role-tag">AGENT 01</span>
+          </div>
+          <div class="agent-bridge">
+            <span class="bridge-line"></span><span>← A2A →</span><span class="bridge-line"></span>
+          </div>
+          <div class="agent-identity">
+            <span class="avatar specialist">V<span>✧</span></span>
+            <div><strong>Venue specialist</strong><span>Owns venue selection</span></div>
+            <span class="role-tag">AGENT 02</span>
+          </div>
+        </div>
+
+        <div class="workspace-grid">
+          <section class="panel brief-panel" aria-labelledby="brief-heading">
+            <div class="panel-heading">
+              <div>
+                <span class="step-label">01 / THE REQUEST</span>
+                <h2 id="brief-heading">Your workshop brief</h2>
+              </div>
+              <span class="small-icon">↗</span>
+            </div>
+            <form id="brief-form">
+              <label for="mode">Decision mode</label
+              ><select id="mode">
+                <option value="rehearsal">Rehearsal · scripted agents</option>
+                <option value="live" disabled>Live AI · connect a model</option>
+              </select>
+              <label for="title">Workshop name</label
+              ><input
+                id="title"
+                name="title"
+                value="AI Operations workshop"
+                maxlength="160"
+                required
+              />
+              <div class="field-row">
+                <div>
+                  <label for="attendees">People</label
+                  ><input
+                    id="attendees"
+                    type="number"
+                    min="1"
+                    max="200"
+                    step="1"
+                    value="30"
+                    required
+                  />
+                </div>
+                <div>
+                  <label for="duration">Duration</label
+                  ><input id="duration" value="4 hours" disabled />
+                </div>
+              </div>
+              <label for="preferred-budget"
+                >Preferred budget <span class="optional">soft target</span></label
+              >
+              <div class="money-input">
+                <span>AED</span
+                ><input
+                  id="preferred-budget"
+                  type="number"
+                  min="1"
+                  max="100000"
+                  step="1"
+                  value="1400"
+                />
+              </div>
+              <label for="budget"
+                >Hard spending limit <span class="optional">never exceed</span></label
+              >
+              <div class="money-input">
+                <span>AED</span
+                ><input
+                  id="budget"
+                  type="number"
+                  min="1"
+                  max="100000"
+                  step="1"
+                  placeholder="Let the agent ask"
+                  value="1600"
+                />
+              </div>
+              <p class="field-hint">
+                The specialist must justify any spend above your preferred budget.
+              </p>
+              <label for="priority">What matters most?</label>
+              <select id="priority">
+                <option value="undecided">Let the specialist clarify</option>
+                <option value="value">Keep the cost down</option>
+                <option value="quiet">A quieter room</option>
+                <option value="breakouts">Separate breakout rooms</option>
+              </select>
+              <label for="preferences">Workshop preferences</label>
+              <textarea id="preferences" rows="3" maxlength="600">
+Small-group discussions matter more than a prestigious location. Explain whether spending extra is worthwhile.</textarea
+              >
+              <fieldset>
+                <legend>Must-haves</legend>
+                <label class="check-row"
+                  ><input id="projector" type="checkbox" checked /><span>Projector</span
+                  ><span class="check-detail">Present & share</span></label
+                ><label class="check-row"
+                  ><input id="accessible" type="checkbox" checked /><span>Step-free access</span
+                  ><span class="check-detail">Accessible entry</span></label
+                >
+              </fieldset>
+              <button id="start" type="submit" class="button primary full">
+                Start the handoff <span>↗</span>
+              </button>
+              <p class="brief-footnote">Fictional venues. No bookings or purchases.</p>
+            </form>
+            <div class="scenario-box">
+              <span class="small-label">TRY A DIFFERENT OUTCOME</span
+              ><button data-preset="discussion">Discuss the trade-off <span>→</span></button
+              ><button data-preset="quiet">Prioritize a quiet room <span>→</span></button
+              ><button data-preset="complete">Keep the cost down <span>→</span></button
+              ><button data-preset="tight">A budget that cannot work <span>→</span></button>
+            </div>
+          </section>
+
+          <div class="handoff-column">
+            <div id="mode-banner" class="mode-banner">
+              <span class="banner-mark">R</span>
+              <div>
+                <strong>Rehearsal mode</strong
+                ><span>Scripted decisions. Real A2A requests between local services.</span>
+              </div>
+            </div>
+            <section class="panel conversation-panel" aria-labelledby="handoff-heading">
+              <div class="conversation-header">
+                <div>
+                  <span class="step-label">02 / THE HANDOFF</span>
+                  <h2 id="handoff-heading">Between the agents</h2>
+                </div>
+                <span id="run-state" class="state-pill">Ready</span>
+              </div>
+              <ol class="progress-track" aria-label="Handoff progress">
+                <li data-phase="discover"><span>1</span>Discover</li>
+                <li data-phase="delegate"><span>2</span>Delegate</li>
+                <li data-phase="clarify"><span>3</span>Clarify</li>
+                <li data-phase="review"><span>4</span>Return</li>
+              </ol>
+              <div class="tabbar">
+                <div class="tabs" role="tablist" aria-label="Handoff detail">
+                  <button
+                    id="conversation-tab"
+                    role="tab"
+                    aria-selected="true"
+                    aria-controls="conversation-content"
+                    data-tab="conversation"
+                  >
+                    Conversation</button
+                  ><button
+                    id="protocol-tab"
+                    role="tab"
+                    aria-selected="false"
+                    aria-controls="protocol-content"
+                    data-tab="protocol"
+                    tabindex="-1"
+                  >
+                    Protocol inspector <span id="trace-count">0</span>
+                  </button>
+                </div>
+                <button id="stop" class="stop-button" hidden>Stop run</button>
+              </div>
+              <div
+                id="conversation-content"
+                role="tabpanel"
+                tabindex="0"
+                aria-labelledby="conversation-tab"
+              >
+                <div id="empty-state" class="empty-state">
+                  <div class="empty-diagram">
+                    <span class="avatar coordinator large">C</span
+                    ><span class="dotted-arrow">······ →</span
+                    ><span class="avatar specialist large">V</span>
+                  </div>
+                  <h3>A good handoff starts with a goal.</h3>
+                  <p>
+                    Your coordinator will find the specialist, explain what you need, and bring the
+                    result back.
+                  </p>
+                  <span class="empty-note">Start with the sample brief on the left.</span>
+                </div>
+                <div
+                  id="events"
+                  class="events"
+                  role="log"
+                  aria-label="Agent conversation"
+                  aria-live="polite"
+                  aria-relevant="additions"
+                ></div>
+                <div id="working-indicator" class="working-indicator" hidden>
+                  <span class="spinner"></span
+                  ><span id="working-text">The agents are working…</span>
+                </div>
+              </div>
+              <div id="protocol-content" role="tabpanel" aria-labelledby="protocol-tab" hidden>
+                <div class="inspector-intro">
+                  <strong>The actual wire exchange.</strong>
+                  <p>
+                    Captured HTTP requests and responses from the official A2A SDK. These contain
+                    the demo brief, not model credentials.
+                  </p>
+                </div>
+                <dl id="task-identifiers" class="task-identifiers"></dl>
+                <div id="trace-list" class="trace-list">
+                  <p class="muted">Start a run to inspect discovery and task messages.</p>
+                </div>
+              </div>
+              <form id="clarification-form" class="clarification" hidden>
+                <div class="clarification-title">
+                  <span>↳</span>
+                  <div>
+                    <strong id="clarification-heading">The specialist has a question.</strong>
+                    <p>Your answer continues the same task.</p>
+                  </div>
+                </div>
+                <label class="sr-only" for="reply-budget">Maximum venue budget in AED</label>
+                <div class="reply-row">
+                  <div class="money-input" id="budget-answer">
+                    <span>AED</span
+                    ><input
+                      id="reply-budget"
+                      type="number"
+                      min="1"
+                      max="100000"
+                      step="1"
+                      value="1400"
+                      required
+                    />
+                  </div>
+                  <div id="priority-answer" hidden>
+                    <label for="reply-priority">Your priority</label
+                    ><select id="reply-priority">
+                      <option value="breakouts">Separate breakout rooms</option>
+                      <option value="quiet">A quieter room</option>
+                      <option value="value">Keep the cost down</option>
+                    </select>
+                  </div>
+                  <button class="button primary" type="submit">Send answer <span>↑</span></button>
+                </div>
+              </form>
+              <div id="outcome-message" class="outcome-message" hidden></div>
+            </section>
+            <section
+              id="comparison"
+              class="panel comparison-panel"
+              aria-labelledby="comparison-heading"
+              hidden
+            >
+              <span class="step-label">THE SPECIALIST'S OPTIONS</span>
+              <h2 id="comparison-heading">Several venues fit. What matters most?</h2>
+              <p>These are catalogue facts. The agent explains how it weighs them.</p>
+              <div id="comparison-grid" class="comparison-grid"></div>
+            </section>
+            <section
+              id="result"
+              class="result-card"
+              aria-labelledby="result-heading"
+              hidden
+            ></section>
+            <div class="learning-note">
+              <span>↳</span>
+              <p>
+                <strong>Notice who chooses the next step.</strong> The specialist can ask a
+                question, use a tool, return a result, or decline the task.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="guide-view" class="view" hidden>
+        <div class="page-heading">
+          <div>
+            <div class="eyebrow">THE EXPLANATION</div>
+            <h1>Operations vs. responsibility.</h1>
+            <p>Two complementary protocols. Two different kinds of handoff.</p>
+          </div>
+        </div>
+        <div class="comparison-grid">
+          <article class="concept-card">
+            <span class="concept-index">01 / MCP</span>
+            <h2>“Run this operation.”</h2>
+            <p>An agent calls a tool with defined inputs and receives its output.</p>
+            <div class="concept-flow"><span>Agent</span><b>→ MCP →</b><span>Tool</span></div>
+            <code>lookup_venues(capacity=30)</code>
+            <p class="muted">
+              The agent chooses the operation. The tool implements that capability. Tools can
+              contain AI, too.
+            </p>
+          </article>
+          <article class="concept-card emphasized">
+            <span class="concept-index">02 / A2A</span>
+            <h2>“Take on this goal.”</h2>
+            <p>An agent gives a specialist a task and the context needed to work on it.</p>
+            <div class="concept-flow"><span>Agent</span><b>↔ A2A ↔</b><span>Agent</span></div>
+            <blockquote>Recommend a venue that fits our workshop.</blockquote>
+            <p class="muted">
+              The specialist chooses its approach, can request more input, and returns an artifact
+              for review.
+            </p>
+          </article>
+        </div>
+        <div class="guide-grid">
+          <article class="panel guide-card">
+            <span class="step-label">THE FOUR THINGS TO WATCH</span>
+            <h2>Follow the responsibility.</h2>
+            <ol class="lesson-steps">
+              <li>
+                <strong>Discover the specialist</strong>
+                <p>
+                  An Agent Card describes skills, endpoints, protocol support, and any
+                  authentication requirements. Here, the coordinator knows the specialist’s base
+                  URL.
+                </p>
+              </li>
+              <li>
+                <strong>Describe the task</strong>
+                <p>
+                  Send a goal, context, constraints, and the expected result. The receiving service
+                  creates a task ID; a context ID groups the conversation.
+                </p>
+              </li>
+              <li>
+                <strong>Allow a decision</strong>
+                <p>
+                  The specialist may need clarification, call its own tools, or report that the task
+                  cannot be done. Missing information should not become a guess.
+                </p>
+              </li>
+              <li>
+                <strong>Review the return</strong>
+                <p>
+                  The specialist returns an artifact. The coordinator checks capacity, facilities,
+                  and the hard spending limit. In live mode it also reviews the trade-off and may
+                  request one revision before delivering its answer. Protocol success alone is not
+                  proof of correctness.
+                </p>
+              </li>
+            </ol>
+          </article>
+          <article class="panel guide-card">
+            <span class="step-label">WHAT THIS LAB ACTUALLY DOES</span>
+            <h2>Know what you’re showing.</h2>
+            <ul class="scope-list">
+              <li>
+                <strong>Real local A2A traffic</strong
+                ><span
+                  >Official SDK, Agent Card discovery, SendMessage, GetTask, and CancelTask over
+                  HTTP.</span
+                >
+              </li>
+              <li>
+                <strong>Two decision modes</strong
+                ><span
+                  >Rehearsal follows code-defined rules. Live AI uses separate coordinator and
+                  specialist instructions with the configured model.</span
+                >
+              </li>
+              <li>
+                <strong>A local tool</strong
+                ><span
+                  >The specialist calls a catalogue function. MCP is explained here, but no live MCP
+                  server is implemented.</span
+                >
+              </li>
+              <li>
+                <strong>A bounded classroom demo</strong
+                ><span
+                  >Two HTTP services in one Node process. One local operator, fictional data,
+                  in-memory tasks, and no cross-company deployment or booking.</span
+                >
+              </li>
+            </ul>
+            <a
+              class="text-link"
+              href="https://a2a-protocol.org/v1.0.0/specification/"
+              target="_blank"
+              rel="noreferrer"
+              >Read the A2A specification ↗</a
+            >
+          </article>
+        </div>
+        <div class="takeaway">
+          <span class="small-label">SAY IT IN ONE SENTENCE</span>
+          <p>
+            “A tool call asks for an operation. Delegation asks another agent to take responsibility
+            for a subtask.”
+          </p>
+        </div>
+      </section>
+
+      <section id="catalogue-view" class="view" hidden>
+        <div class="page-heading">
+          <div>
+            <div class="eyebrow">THE SPECIALIST’S SOURCE MATERIAL</div>
+            <h1>Six venues. Real trade-offs.</h1>
+            <p>Invented places and prices, designed to make the agent’s choices easy to check.</p>
+          </div>
+          <span class="catalogue-badge">FICTIONAL DATA</span>
+        </div>
+        <div id="catalogue-grid" class="catalogue-grid"></div>
+        <p class="catalogue-note">
+          All prices are in AED for a four-hour workshop. This catalogue does not represent real
+          availability or booking offers.
+        </p>
+      </section>
+      <footer>
+        <span>Built to explain the handoff.</span
+        ><span
+          >Team 03 <span class="footer-dot">·</span> AI Operations
+          <span class="footer-dot">·</span> Final course lab</span
+        >
+      </footer>
+    </main>
+
+    <dialog id="connection-dialog" aria-labelledby="connection-heading">
+      <form id="connection-form">
+        <div class="dialog-heading">
+          <div>
+            <span class="eyebrow">LIVE AI</span>
+            <h2 id="connection-heading">Connect your agents.</h2>
+          </div>
+          <button
+            id="connection-close"
+            class="icon-button"
+            type="button"
+            aria-label="Close connection settings"
+          >
+            ×
+          </button>
+        </div>
+        <p class="muted">
+          Both agents use this connection with separate roles and instructions. Rehearsal works
+          without a model.
+        </p>
+        <label for="provider">Provider</label
+        ><select id="provider">
+          <option value="openai">OpenAI API</option>
+          <option value="ollama">Local Ollama</option></select
+        ><label for="model">Model name</label
+        ><input id="model" value="gpt-4.1-mini" maxlength="101" required spellcheck="false" />
+        <div id="key-field">
+          <label for="api-key">API key</label
+          ><input
+            id="api-key"
+            type="password"
+            autocomplete="off"
+            placeholder="Optional if configured in .env"
+          />
+          <p class="field-hint">
+            Keys entered here stay in server memory. Disconnect does not erase a key you saved in
+            .env; restarting loads that file again. Live runs use your OpenAI API billing.
+          </p>
+        </div>
+        <p id="ollama-hint" class="field-hint" hidden>
+          Ollama must already be running at 127.0.0.1:11434 with your chosen model downloaded. A
+          model with reliable structured output works best.
+        </p>
+        <p id="connection-error" class="form-error" role="alert"></p>
+        <div class="dialog-actions">
+          <button id="disconnect" type="button" class="button secondary">Disconnect</button
+          ><button type="submit" class="button primary">Save connection <span>↗</span></button>
+        </div>
+        <p class="dialog-footnote">
+          Saving configures the connection. Your first live run tests it; the app will never
+          silently switch to scripted responses.
+        </p>
+      </form>
+    </dialog>
+    <div id="toast" class="toast" role="alert" hidden></div>
+  </body>
+</html>

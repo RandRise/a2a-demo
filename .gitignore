@@ -1,0 +1,12 @@
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+
+# Keep this folder safe even when published as its own repository.
+.env
+.env.*
+!.env.example
+node_modules/
+.qa/
+*.log
+docs/.vitepress/cache/
+docs/.vitepress/dist/

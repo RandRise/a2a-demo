@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Team 3 presents Relay: discovery, delegation and clarification between two agents over A2A."
+    />
+    <title>Relay — How agents talk to agents</title>
+    <link rel="stylesheet" href="slides.css" />
+    <script defer src="slides.js"></script>
+  </head>
+  <body>
+    <header class="toolbar">
+      <a href="../index.html" class="brand">Relay / Team 3</a>
+      <div class="tools">
+        <button id="notes-toggle" aria-expanded="false" aria-controls="speaker-notes">
+          Speaker notes
+        </button>
+        <button id="fullscreen">Full screen</button>
+        <button id="print">Print / PDF</button>
+      </div>
+    </header>
+    <main id="deck" aria-label="Course presentation">
+      <section class="slide cover" aria-labelledby="title-1">
+        <p class="eyebrow">AI Operations · Final course task · Team 3</p>
+        <h1 id="title-1">How do agents<br />talk to other agents?</h1>
+        <p class="lead">Relay: two jobs, one workshop, a visible A2A handoff.</p>
+        <p class="caption">A local teaching demo with invented venue data</p>
+        <aside class="notes">
+          Today I will show how one agent asks another agent to do a job. Our example is choosing a
+          venue for a workshop. We can watch discovery, delegation, a clarification question and a
+          returned recommendation. The venue data is fictional, but the agents exchange real HTTP
+          requests through the official A2A SDK. Allow around ten minutes, including the live
+          demonstration.
+        </aside>
+      </section>
+      <section class="slide" aria-labelledby="title-2">
+        <h2 id="title-2">The job we want done</h2>
+        <p class="statement">
+          “Find a venue for a 30-person workshop.<br />Stay under AED 1,600. Explain the trade-off.”
+        </p>
+        <div class="columns">
+          <div>
+            <h3>The coordinator owns the request</h3>
+            <p>It delegates the search, relays questions and reviews the recommendation.</p>
+          </div>
+          <div>
+            <h3>The specialist owns the search</h3>
+            <p>
+              It checks the catalogue, asks what matters, and recommends a venue or rejects the
+              brief.
+            </p>
+          </div>
+        </div>
+        <aside class="notes">
+          The preferred budget is AED 1,400, but the absolute maximum is AED 1,600. These are
+          different constraints. A slightly more expensive venue can be acceptable if it meets a
+          meaningful preference. Both agents can use the same model provider. Different jobs,
+          instructions and responsibilities create the delegation boundary.
+        </aside>
+      </section>
+      <section class="slide" aria-labelledby="title-3">
+        <h2 id="title-3">A tool call and an agent delegation</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Question</th>
+              <th>Tool through MCP</th>
+              <th>Agent through A2A</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>What is requested?</th>
+              <td>A named operation and its inputs</td>
+              <td>A goal with context and constraints</td>
+            </tr>
+            <tr>
+              <th>Who chooses the steps?</th>
+              <td>The calling agent chooses the tool operation</td>
+              <td>The receiving agent can choose how to work</td>
+            </tr>
+            <tr>
+              <th>What comes back?</th>
+              <td>The operation's result</td>
+              <td>Task status, a question, rejection or an artifact</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="caption">
+          In this demo, catalogue lookup is a direct function call. MCP is explained, not connected.
+        </p>
+        <aside class="notes">
+          The key difference is the interface and responsibility. Asking a tool to look up venues
+          specifies an operation. Asking a specialist to find a suitable venue delegates a job. A
+          tool may still contain complex logic or AI, and MCP can support richer interactions. Do
+          not reduce the distinction to whether something is intelligent or takes a long time.
+          Sources: https://modelcontextprotocol.io/docs/learn/architecture and
+          https://a2a-protocol.org/latest/specification/
+        </aside>
+      </section>
+      <section class="slide" aria-labelledby="title-4">
+        <h2 id="title-4">Two services, separate responsibilities</h2>
+        <div class="columns">
+          <div>
+            <p class="eyebrow">Coordinator · port 8780</p>
+            <h3>The user's side</h3>
+            <p>Serves the UI, discovers the specialist, sends the brief and reviews its answer.</p>
+          </div>
+          <div>
+            <p class="eyebrow">Venue specialist · port 8781</p>
+            <h3>The delegated job</h3>
+            <p>Uses its own prompt and catalogue tool to decide what to ask and recommend.</p>
+          </div>
+        </div>
+        <p class="statement small">The handoff crosses an HTTP boundary using A2A 1.0 JSON-RPC.</p>
+        <p class="caption">
+          Official @a2a-js/sdk 1.3.0 · Two local services in one Node.js process
+        </p>
+        <aside class="notes">
+          The coordinator never calls the specialist executor as an internal framework handoff. It
+          uses the A2A client and actual HTTP. This demonstrates the communication boundary locally.
+          It does not establish interoperability with another company's agent or certify complete
+          protocol conformance. Source: docs/ARCHITECTURE.md and src/app.mjs.
+        </aside>
+      </section>
+      <section class="slide" aria-labelledby="title-5">
+        <h2 id="title-5">Discovery begins with an Agent Card</h2>
+        <p class="statement small">
+          The coordinator knows an address.<br />It reads what the specialist offers before
+          delegating.
+        </p>
+        <p class="code-line">GET /.well-known/agent-card.json</p>
+        <ol class="steps">
+          <li><strong>Identity</strong><span>Which agent is this?</span></li>
+          <li><strong>Skills</strong><span>Does it offer venue selection?</span></li>
+          <li><strong>Interface</strong><span>Where and how should we send the task?</span></li>
+        </ol>
+        <p class="caption">
+          Known-address discovery. This demo does not use a search engine or agent registry.
+        </p>
+        <aside class="notes">
+          An Agent Card is machine-readable information describing an agent and its capabilities.
+          Discovery here means reading a configured specialist address, not finding any agent
+          anywhere on the internet. The UI's protocol inspector shows the actual response. Sources:
+          src/protocol/card.mjs and https://a2a-protocol.org/latest/topics/agent-discovery/
+        </aside>
+      </section>
+      <section class="slide" aria-labelledby="title-6">
+        <h2 id="title-6">A task has a continuing identity</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Exchange</th>
+              <th>What happens</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>SendMessage</td>
+              <td>The coordinator delegates a structured workshop brief.</td>
+            </tr>
+            <tr>
+              <td>GetTask</td>
+              <td>It follows progress using the returned task ID.</td>
+            </tr>
+            <tr>
+              <td>input-required</td>
+              <td>The specialist asks for a missing budget or priority.</td>
+            </tr>
+            <tr>
+              <td>SendMessage</td>
+              <td>The reply continues the same task and context.</td>
+            </tr>
+            <tr>
+              <td>completed + artifact</td>
+              <td>The specialist returns a recommendation for review.</td>
+            </tr>
+          </tbody>
+        </table>
+        <aside class="notes">
+          These are the main exchanges, not a pasted live transcript. The inspector contains the
+          actual traffic for each run. A task can also be rejected, fail or be cancelled. Task IDs
+          distinguish work items. Context IDs connect related work. A2A standardizes their exchange,
+          while our brief schema remains application-specific. Source: src/agents/coordinator.mjs
+          and docs/ARCHITECTURE.md.
+        </aside>
+      </section>
+      <section class="slide" aria-labelledby="title-7">
+        <h2 id="title-7">Three valid venues, different compromises</h2>
+        <p class="intro">
+          30 attendees · Projector · Accessible · Preferred AED 1,400 · Maximum AED 1,600
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>Venue</th>
+              <th>4-hour price</th>
+              <th>Noise</th>
+              <th>Breakout rooms</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Canal Loft</th>
+              <td>AED 1,200</td>
+              <td>Moderate</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <th>Cedar Room</th>
+              <td>AED 1,350</td>
+              <td>Low</td>
+              <td>0</td>
+            </tr>
+            <tr>
+              <th>Harbor Hall</th>
+              <td>AED 1,550</td>
+              <td>Moderate</td>
+              <td>2</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="statement small">“Suitable” depends on what the workshop needs.</p>
+        <p class="caption">Invented catalogue facts. Three of six venues meet this brief.</p>
+        <aside class="notes">
+          All three meet the hard requirements. Canal Loft saves money. Cedar Room is quieter.
+          Harbor Hall offers two separate rooms but exceeds the preferred budget by AED 150. It
+          remains AED 50 under the hard maximum. This makes clarification useful: the answer can
+          change the recommendation. Source: src/domain/catalogue.mjs.
+        </aside>
+      </section>
+      <section class="slide" aria-labelledby="title-8">
+        <h2 id="title-8">Clarification changes the decision</h2>
+        <p class="statement">
+          “What matters most: a quieter room,<br />separate breakout rooms, or keeping costs down?”
+        </p>
+        <div class="columns">
+          <div>
+            <h3>Choose breakout rooms</h3>
+            <p>
+              Harbor Hall offers two rooms for group work, with a higher price and moderate noise.
+            </p>
+          </div>
+          <div>
+            <h3>Choose a quieter room</h3>
+            <p>
+              Cedar Room offers a quieter setting below the preferred budget, without separate
+              rooms.
+            </p>
+          </div>
+        </div>
+        <p class="caption">Illustrative wording. Live questions and explanations can vary.</p>
+        <aside class="notes">
+          We leave priority undecided, then answer the specialist's question. Only the requested
+          field can change during continuation. The answer keeps the same task ID and context ID. A
+          missing budget can trigger an earlier question, so one task can need more than one
+          clarification. Changing preferences between runs is more informative than repeatedly
+          running an identical brief.
+        </aside>
+      </section>
+      <section class="slide" aria-labelledby="title-9">
+        <h2 id="title-9">Rehearsal and Live AI</h2>
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Rehearsal</th>
+              <th>Live AI</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Decisions</th>
+              <td>Explicit rules</td>
+              <td>Model calls with separate agent prompts</td>
+            </tr>
+            <tr>
+              <th>A2A transport</th>
+              <td>Real local HTTP exchanges</td>
+              <td>Real local HTTP exchanges</td>
+            </tr>
+            <tr>
+              <th>Preferences</th>
+              <td>Ranks by selected priority</td>
+              <td>Also interprets free-text preferences</td>
+            </tr>
+            <tr>
+              <th>Use in class</th>
+              <td>Repeatable protocol walkthrough</td>
+              <td>Observe decisions and evaluate explanations</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="caption">
+          The same recommendation can be correct in both modes. Matching outputs alone do not prove
+          model autonomy.
+        </p>
+        <aside class="notes">
+          A2A is the communication protocol, not the reasoning engine. Live AI has no scripted
+          fallback. Connection errors remain errors. Evidence comes from the selected mode, observed
+          provider calls, actual transport and whether the decisions respond to the brief. A
+          different answer is not automatically better. Source: docs/ARCHITECTURE.md.
+        </aside>
+      </section>
+      <section class="slide" aria-labelledby="title-10">
+        <h2 id="title-10">What we observed with OpenAI</h2>
+        <div class="columns results">
+          <div>
+            <p class="eyebrow">Separate breakout rooms</p>
+            <h3>Harbor Hall</h3>
+            <p class="price">AED 1,550</p>
+            <p>AED 150 above the preferred budget.<br />The coordinator accepted the trade-off.</p>
+          </div>
+          <div>
+            <p class="eyebrow">Quieter room, after correction</p>
+            <h3>Cedar Room</h3>
+            <p class="price">AED 1,350</p>
+            <p>AED 50 below the preferred budget.<br />AED 250 under the hard limit.</p>
+          </div>
+        </div>
+        <p class="caption">
+          Recorded live OpenAI runs, gpt-4.1-mini, 14 October 2026. Neither accepted run requested a
+          revision.
+        </p>
+        <aside class="notes">
+          These are observations recorded in docs/VALIDATION.md, not guaranteed outputs for future
+          runs. Both correct live runs returned recommendation artifacts and the coordinator
+          accepted them. The first quiet-room attempt contained a budget explanation error. The next
+          slide explains that limitation rather than hiding it.
+        </aside>
+      </section>
+      <section class="slide" aria-labelledby="title-11">
+        <h2 id="title-11">Delegation still needs review</h2>
+        <p class="statement small">A completed task can contain a wrong explanation.</p>
+        <p>
+          The first quiet-room run chose Cedar Room correctly, but described AED 1,350 as above the
+          AED 1,400 preferred budget.
+        </p>
+        <ol class="steps">
+          <li>
+            <strong>Code checks facts</strong
+            ><span>Canonical prices, constraints and budget arithmetic</span>
+          </li>
+          <li>
+            <strong>Coordinator reviews</strong><span>Accept, request one revision, or reject</span>
+          </li>
+          <li>
+            <strong>Revisions stay bounded</strong
+            ><span>A new linked task in the same context, at most once</span>
+          </li>
+        </ol>
+        <p class="caption">
+          Linked revisions are verified with model fixtures. A live model-requested revision has not
+          been observed.
+        </p>
+        <aside class="notes">
+          The correction supplies computed budget facts to the reviewer and screens a narrow class
+          of above/below-preferred-budget contradictions. It is not a general fact checker.
+          Code-triggered corrections are labelled separately from model requests. A completed task
+          cannot be reopened, so revision creates a new task linked by referenceTaskIds.
+          Clarification, by contrast, continues the existing task. Sources:
+          src/domain/budget-review.mjs, src/agents/coordinator.mjs and docs/VALIDATION.md.
+        </aside>
+      </section>
+      <section class="slide" aria-labelledby="title-12">
+        <h2 id="title-12">The interface makes the handoff visible</h2>
+        <div class="columns">
+          <div>
+            <h3>Conversation</h3>
+            <p>Watch delegation, public explanations and clarification questions.</p>
+            <h3>Recommendation</h3>
+            <p>Compare venues, budget stretch and the coordinator's review.</p>
+          </div>
+          <div>
+            <h3>Protocol inspector</h3>
+            <p>Read actual Agent Card requests, messages and task identifiers.</p>
+            <h3>VitePress guide</h3>
+            <p>Walk through the sequence, try the quiz and inspect the architecture.</p>
+          </div>
+        </div>
+        <p class="caption">
+          The UI shows public explanations. It does not expose hidden model reasoning.
+        </p>
+        <aside class="notes">
+          Now point out the brief editor, Rehearsal/Live AI selector, clarification form, comparison
+          and result. The inspector is especially useful: it distinguishes an explanation of A2A
+          from evidence that A2A requests actually crossed the local service boundary. The guide
+          runs separately on port 5173.
+        </aside>
+      </section>
+      <section class="slide" aria-labelledby="title-13">
+        <h2 id="title-13">Code organization and local setup</h2>
+        <div class="columns">
+          <div>
+            <h3>A small, separated codebase</h3>
+            <p>
+              <code>src/agents</code> — coordinator and specialist<br /><code>src/protocol</code> —
+              Agent Card<br /><code>src/domain</code> — catalogue and checks<br /><code
+                >public</code
+              >
+              — UI and slides<br /><code>docs</code> — VitePress explanation
+            </p>
+          </div>
+          <div>
+            <h3>Start from the repository folder</h3>
+            <p class="code-line">npm ci<br />npm start</p>
+            <p>
+              Open <code>127.0.0.1:8780</code>.<br />Run <code>npm run docs:dev</code> for the
+              guide.
+            </p>
+          </div>
+        </div>
+        <p class="caption">
+          Copy .env.example to .env for Live AI. The local key stays on the server and outside Git.
+        </p>
+        <aside class="notes">
+          Rehearsal needs no key. For Live AI, the user enters their own OpenAI key in the ignored
+          local .env and restarts the server. Never paste it into a slide, message or commit. The
+          shareable example has a blank key. A GitHub repository contains the source, not a hosted
+          Node service. Node 20.18 or later is required. Source: README.md and
+          src/config/environment.mjs.
+        </aside>
+      </section>
+      <section class="slide" aria-labelledby="title-14">
+        <h2 id="title-14">Evidence and compatibility limits</h2>
+        <div class="columns">
+          <div>
+            <h3>Verified for this project</h3>
+            <p>
+              19 automated Node tests<br />Browser and accessibility checks<br />Same-task
+              clarification<br />Linked revision with fixtures<br />Two accepted live priority
+              outcomes
+            </p>
+          </div>
+          <div>
+            <h3>Outside the demonstrated scope</h3>
+            <p>
+              Cross-company interoperability<br />Full A2A conformance certification<br />Streaming
+              and push notifications<br />A live MCP server<br />Real venue booking or availability
+            </p>
+          </div>
+        </div>
+        <p class="caption">
+          Automated checks and live observations answer different questions. Neither guarantees
+          future model correctness.
+        </p>
+        <aside class="notes">
+          The supported teaching scope is A2A 1.0 JSON-RPC with known-address discovery, messages,
+          polling, cancellation, clarification and artifacts. Both services run locally. Browser
+          checks include responsive layouts and automated WCAG A/AA checks, not an accessibility
+          certification. Check docs/VALIDATION.md for dated evidence and limitations.
+        </aside>
+      </section>
+      <section class="slide" aria-labelledby="title-15">
+        <h2 id="title-15">The classroom demonstration</h2>
+        <ol class="demo-steps">
+          <li>
+            Select <strong>Discuss the trade-off</strong> and choose Rehearsal or configured Live
+            AI.
+          </li>
+          <li>Start the handoff. Open the inspector and identify the Agent Card and task ID.</li>
+          <li>
+            Answer <strong>Separate breakout rooms</strong>. Check the artifact, cost and review.
+          </li>
+          <li>
+            Start a new run with <strong>Prioritize a quiet room</strong>. Compare the reasoning and
+            result.
+          </li>
+          <li>
+            Try <strong>A budget that cannot work</strong>. Explain why rejection is a valid
+            outcome.
+          </li>
+        </ol>
+        <p class="caption">
+          Live AI uses API billing. Rehearsal remains available if the provider cannot be reached.
+        </p>
+        <aside class="notes">
+          Keep the maximum at AED 1,600 and preferred budget at AED 1,400 for the first comparison.
+          Use a new run to change the priority. If the live model takes a different valid path,
+          discuss the actual evidence rather than claiming the slide predicted it. If the API fails,
+          explicitly switch to Rehearsal and identify it as scripted decisions over real local A2A
+          transport. Never claim an automatic fallback.
+        </aside>
+      </section>
+      <section class="slide cover" aria-labelledby="title-16">
+        <p class="eyebrow">The course takeaway</p>
+        <h2 id="title-16">A tool performs an operation.<br />An agent takes on a task.</h2>
+        <p class="lead">
+          Delegation adds decisions, questions and responsibility.<br />A2A gives those exchanges a
+          common protocol.
+        </p>
+        <p class="caption">
+          Explain the discovery, the task identity, the clarification and the returned artifact.
+        </p>
+        <aside class="notes">
+          Ask the class: if the specialist asks a question, has the task failed? No. Clarification
+          is part of the delegated job. Then ask: does a completed task guarantee a correct result?
+          No. Our budget explanation error is a concrete example. The coordinator still has to
+          evaluate what comes back. End by opening the repository or the VitePress guide for
+          questions.
+        </aside>
+      </section>
+    </main>
+    <nav class="navigation" aria-label="Slide navigation">
+      <button id="previous" aria-label="Previous slide">← Previous</button>
+      <label for="slide-picker" class="sr-only">Choose a slide</label>
+      <select id="slide-picker"></select>
+      <p id="position" role="status" aria-live="polite"></p>
+      <button id="next" aria-label="Next slide">Next →</button>
+    </nav>
+    <aside id="speaker-notes" hidden>
+      <h2>Speaker notes</h2>
+      <p id="notes-text"></p>
+    </aside>
+    <p class="keyboard-help">
+      Arrow keys to navigate · N for notes · F for full screen · Home / End
+    </p>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+Hey everyone! Here's Team 3's final AI Operations project: Relay — How do agents talk to other agents?
+
+We built a workshop-planning demo with two agents: a coordinator that owns the user's request and a venue specialist that searches, asks questions and returns a recommendation. You can watch discovery through an Agent Card, the A2A task handoff, clarification on the same task, and the returned result in a protocol inspector.
+
+Try different priorities: lower cost, a quieter room, or separate breakout rooms. Rehearsal uses scripted decisions over real local A2A HTTP; Live AI uses your own OpenAI key. Our recorded live runs selected Harbor Hall for breakout rooms and Cedar Room for quiet. We also caught a model budget-explanation error, so the project shows why a completed task still needs review.
+
+The repo includes the app, a VitePress walkthrough, a 16-slide presentation with speaker notes, and the validation record. It demonstrates A2A 1.0 locally with invented venues. MCP is explained as the tool-connection comparison; there is no live MCP server or real booking.
+
+GitHub: https://github.com/RandRise/a2a-demo
+
+To try it: clone the repo, run npm ci, then npm start. Open http://127.0.0.1:8780. Rehearsal needs no key. For Live AI, copy .env.example to .env, add your own key locally and restart. Keep .env out of Git. The slides are at /presentation/ and the guide starts with npm run docs:dev.
+
+Our takeaway: a tool call requests an operation; agent delegation hands over a task that may involve decisions, questions and a result to review.
