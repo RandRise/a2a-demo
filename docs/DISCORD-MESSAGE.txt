@@ -1,13 +1,22 @@
-Hey everyone! Here's Team 3's final AI Operations project: Relay — How do agents talk to other agents?
+Hey team! Here's our final A2A demo and PowerPoint presentation. The ZIP contains everything we need to rehearse. My API key is NOT included, and you don't need a key for Rehearsal mode.
 
-We built a workshop-planning demo with two agents: a coordinator that owns the user's request and a venue specialist that searches, asks questions and returns a recommendation. You can watch discovery through an Agent Card, the A2A task handoff, clarification on the same task, and the returned result in a protocol inspector.
+SETUP
+1. Extract the whole ZIP first, then open the a2a-demo folder.
+2. Install Node.js if needed (version 20.18 or newer).
+3. Open a terminal in that folder and run:
+   npm ci
+   npm start
+4. Open http://127.0.0.1:8780 and keep the terminal running.
 
-Try different priorities: lower cost, a quieter room, or separate breakout rooms. Rehearsal uses scripted decisions over real local A2A HTTP; Live AI uses your own OpenAI key. Our recorded live runs selected Harbor Hall for breakout rooms and Cedar Room for quiet. We also caught a model budget-explanation error, so the project shows why a completed task still needs review.
+TRY THIS FIRST — NO KEY NEEDED
+Choose Rehearsal and "Discuss the trade-off", then start the handoff. Answer "Separate breakout rooms" when the specialist asks. Watch the recommendation and coordinator review. Open Protocol inspector to see the actual A2A requests and task ID. Then start a new run with "Prioritize a quiet room" and compare the result.
 
-The repo includes the app, a VitePress walkthrough, a 16-slide presentation with speaker notes, and the validation record. It demonstrates A2A 1.0 locally with invented venues. MCP is explained as the tool-connection comparison; there is no live MCP server or real booking.
+Rehearsal uses scripted decisions with real local A2A HTTP. Live AI is optional: use your OWN OpenAI key in a local .env copied from .env.example, restart the app, and select Live AI. This uses your API billing. Never share or commit .env.
 
-GitHub: https://github.com/RandRise/a2a-demo
+PRESENTATION & GUIDE
+Open presentation/Relay-Team-3.pptx in PowerPoint. It has 16 slides and speaker notes. For the interactive explanation, open a second terminal in a2a-demo, run npm run docs:dev, and visit http://127.0.0.1:5173.
 
-To try it: clone the repo, run npm ci, then npm start. Open http://127.0.0.1:8780. Rehearsal needs no key. For Live AI, copy .env.example to .env, add your own key locally and restart. Keep .env out of Git. The slides are at /presentation/ and the guide starts with npm run docs:dev.
+Read START-HERE.md if you get stuck. If a port is already in use, stop your earlier demo terminal with Ctrl+C before starting again.
 
-Our takeaway: a tool call requests an operation; agent delegation hands over a task that may involve decisions, questions and a result to review.
+Repo: https://github.com/RandRise/a2a-demo
+ZIP: https://github.com/RandRise/a2a-demo/raw/refs/heads/main/sharing/Relay-Team-Pack.zip

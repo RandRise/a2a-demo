@@ -16,6 +16,11 @@ On Windows, you can also double-click `start-walkthrough.cmd` to open the guide.
 
 ## Presentation and class message
 
+Download the [teammate ZIP](sharing/Relay-Team-Pack.zip), extract it, and follow
+[START-HERE.md](START-HERE.md). It contains the demo and the
+[editable PowerPoint deck](presentation/Relay-Team-3.pptx). Rehearsal needs no key.
+The ZIP includes a blank `.env.example` and excludes local credentials.
+
 Open [the 16-slide presentation](http://127.0.0.1:8780/presentation/) while the
 app is running, or open `public/presentation/index.html` directly in your browser.
 It works offline and includes speaker notes, keyboard navigation, full-screen

@@ -2,6 +2,10 @@
 
 ## Slide deck
 
+The native PowerPoint version is `presentation/Relay-Team-3.pptx` in the repository
+or teammate ZIP. It contains 16 slides with editable text, native tables and speaker
+notes. Open it in PowerPoint and use Presenter View for the notes.
+
 With `npm start` running, open [the 16-slide presentation](http://127.0.0.1:8780/presentation/).
 You can also open `public/presentation/index.html` directly in a browser without a server.
 Use the arrow keys to move, **N** for speaker notes, **F** for full screen,
